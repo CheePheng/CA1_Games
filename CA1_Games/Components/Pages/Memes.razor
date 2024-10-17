@@ -1,0 +1,89 @@
+﻿@page "/memes"
+@using Newtonsoft.Json
+@using CA1_Games.Components.Data
+
+<h3>Memes</h3>
+
+@* <h4>Search Memes by Keyword</h4>
+<div style="display: flex; justify-content: center; margin-bottom: 20px;">
+    <input type="text" @bind="searchKeyword" placeholder="Enter keyword..." style="padding: 8px; font-size: 1em; width: 300px;" />
+    <button @onclick="FetchMemeByKeyword" style="padding: 8px; font-size: 1em; margin-left: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px;">
+        Search
+    </button>
+</div> *@
+
+@if (meme != null)
+{
+    <div>
+        <h4>@meme.description</h4>
+        <img src="@meme.url" alt="Meme Image" style="max-width: 100%; height: auto;" />
+        <p>Type: @meme.type</p>
+        <p>Dimensions: @meme.width x @meme.height</p>
+        <p>Ratio: @meme.ratio</p>
+    </div>
+}
+else
+{
+    <p>Loading meme...</p>
+}
+
+<div style="text-align: center; margin-top: 20px;">
+    <button @onclick="FetchRandomMeme" style="padding: 10px 20px; font-size: 1.2em; color: white; background-color: #28a745; border: none; border-radius: 5px;">
+        Get Random Meme
+    </button>
+</div>
+
+@code {
+    private CA1_Games.Components.Data.Memes meme;
+    private string searchKeyword;
+
+    protected override void OnInitialized()
+    {
+        FetchRandomMeme();
+    }
+
+    private void FetchRandomMeme()
+    {
+        var client = new RestClient("https://api.humorapi.com");
+        var request = new RestRequest("memes/random", Method.Get);
+        request.AddParameter("api-key", "1799b37f2959448b9d00ac2c415bae88");
+
+        var response = client.Execute(request);
+
+        if (response.IsSuccessful && response.Content != null)
+        {
+            meme = JsonConvert.DeserializeObject<CA1_Games.Components.Data.Memes>(response.Content);
+        }
+        else
+        {
+            Console.WriteLine("Error Fetching Meme: " + response.ErrorMessage);
+            meme = null;
+        }
+    }
+
+    private void FetchMemeByKeyword()
+    {
+        if (string.IsNullOrWhiteSpace(searchKeyword))
+        {
+            Console.WriteLine("Please enter a keyword.");
+            return;
+        }
+
+        var client = new RestClient("https://api.humorapi.com");
+        var request = new RestRequest("memes/random", Method.Get);
+        request.AddParameter("keywords", searchKeyword);
+        request.AddParameter("api-key", "1799b37f2959448b9d00ac2c415bae88");
+
+        var response = client.Execute(request);
+
+        if (response.IsSuccessful && response.Content != null)
+        {
+            meme = JsonConvert.DeserializeObject<CA1_Games.Components.Data.Memes>(response.Content);
+        }
+        else
+        {
+            Console.WriteLine("Error Fetching Meme by Keyword: " + response.ErrorMessage);
+            meme = null;
+        }
+    }
+}

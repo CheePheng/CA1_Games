@@ -6,4 +6,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Models\" />
+    <Folder Include="Components\Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\workload-business-cartoon-having-too-much-work-to-do.png" />
+  </ItemGroup>
+
 </Project>

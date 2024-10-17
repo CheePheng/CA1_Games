@@ -1,0 +1,136 @@
+﻿@page "/games"
+@using Newtonsoft.Json
+@using CA1_Games.Components.Data
+
+<h3>Games</h3>
+
+@* <select @bind="selectedPlatform" @bind:event="onchange">
+    @foreach (var platform in platforms)
+    {
+        <option value="@platform">@platform</option>
+    }
+</select> *@
+
+@if (games != null && games.Length > 0)
+{
+    <ul>
+        @foreach (var game in games)
+        {
+            <li>
+                <h4>@game.title</h4>
+                <img src="@game.thumbnail" alt="@game.title thumbnail" />
+                <p>@game.short_description</p>
+                <p>Genre: @game.genre</p>
+                <p>Platform: @game.platform</p>
+                <p>Publisher: @game.publisher</p>
+                <p>Developer: @game.developer</p>
+                <p>Release Date: @game.release_date</p>
+                <a href="@game.game_url" target="_blank">Play Now</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No games found.</p>
+}
+
+@code {
+    private CA1_Games.Components.Data.Game[] games;
+    private string selectedPlatform = "all";
+    private string[] platforms = { "all", "PC (Windows)", "Web Browser" };
+
+    protected override void OnInitialized()
+    {
+        FetchGames();
+    }
+
+    private void FetchGames()
+    {
+        var client = new RestClient("https://www.freetogame.com/api/games");
+        var request = new RestRequest($"?platform={Uri.EscapeDataString(selectedPlatform)}", Method.Get);
+        var response = client.Execute(request);
+
+        if (response.IsSuccessful && response.Content != null)
+        {
+            games = JsonConvert.DeserializeObject<CA1_Games.Components.Data.Game[]>(response.Content);
+        }
+        else
+        {
+            Console.WriteLine("Error Fetching Games");
+            games = Array.Empty<CA1_Games.Components.Data.Game>(); 
+        }
+    }
+}
+
+
+
+
+@* 
+        @page "/games"
+@using Newtonsoft.Json
+@using CA1_Games.Components.Data
+
+<h3>Games</h3>
+
+<select @onchange="OnPlatformChange">
+    <option value="pc">PC</option>
+    <option value="browser">Browser</option>
+</select>
+
+@if (games != null && games.Length > 0)
+{
+    <ul>
+        @foreach (var game in games)
+        {
+            <li>
+                <h4>@game.title</h4>
+                <img src="@game.thumbnail" alt="@game.title thumbnail" />
+                <p>@game.short_description</p>
+                <p>Genre: @game.genre</p>
+                <p>Platform: @game.platform</p>
+                <p>Publisher: @game.publisher</p>
+                <p>Developer: @game.developer</p>
+                <p>Release Date: @game.release_date</p>
+                <a href="@game.game_url" target="_blank">Play Now</a>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No games found.</p>
+}
+
+@code {
+    private CA1_Games.Components.Data.Game[] games;
+    private string selectedPlatform = "pc";
+
+    protected override void OnInitialized()
+    {
+        FetchGames(selectedPlatform);
+    }
+
+    private void FetchGames(string platform)
+    {
+        var client = new RestClient("https://www.freetogame.com/api/games");
+        var request = new RestRequest($"?platform={platform}", Method.Get);
+        var response = client.Execute(request);
+
+        if (response.IsSuccessful && response.Content != null)
+        {
+            games = JsonConvert.DeserializeObject<CA1_Games.Components.Data.Game[]>(response.Content);
+        }
+        else
+        {
+            Console.WriteLine("Error Fetching Games");
+        }
+    }
+
+    private void OnPlatformChange(ChangeEventArgs e)
+    {
+        selectedPlatform = e.Value.ToString();
+        FetchGames(selectedPlatform);
+    }
+}
+ *@
